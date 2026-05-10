@@ -1,0 +1,49 @@
+# export PYTORCH_ALLOC_CONF=expandable_segments:True   解决显存碎片化问题，能多挤出一些可用显存
+# 禁用向 HuggingFace 发送遥测/统计请求
+# export HF_HUB_OFFLINE=1
+# export UNSLOTH_DISABLE_STATISTICS=1
+# export HF_DATASETS_OFFLINE=1
+# llamafactory-cli train /hy-tmp/my-project/my_qwen3_lora.yaml 启动命令
+### model
+model_name_or_path: /hy-tmp/my-project/train_model/Qwen3.5-2B-base
+trust_remote_code: true
+flash_attn: auto 
+use_unsloth: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 64          # 代码任务建议 64~128，原来默认 8
+lora_alpha: 128        # 通常设为 rank 的 2 倍
+lora_dropout: 0.05
+lora_target: all       # 覆盖所有线性层，不要只默认 q/v   
+
+### dataset
+dataset: code_train
+dataset_dir: /hy-tmp/my-project/train_data
+template: qwen3_nothink
+cutoff_len: 1024
+max_samples: 1000
+
+### output
+output_dir: /hy-tmp/my-project/saves_model/Qwen3.5-2B-base-test/lora/sft
+logging_steps: 5
+save_steps: 50
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: true
+report_to: none
+
+### train
+per_device_train_batch_size: 2  
+gradient_accumulation_steps: 16  
+learning_rate: 1.0e-4
+# num_train_epochs: 5.0
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+gradient_checkpointing: true  
