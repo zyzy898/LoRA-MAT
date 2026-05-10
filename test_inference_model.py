@@ -85,15 +85,13 @@ def score(pred: str, expected: str):
     """
     综合评分，满分 100，由四个维度合成：
       - 字符相似度   (40%)：SequenceMatcher 逐字符比较
-      - 关键词覆盖率 (30%)：期望中的「有意义关键词」有多少出现在预测中
-      - 行命中率     (20%)：期望的每行（去除缩进后）有多少出现在预测中
-      - 长度惩罚     (10%)：惩罚过度生成，预测越长于期望扣分越多
+      - 关键词覆盖率 (35%)：期望中的「有意义关键词」有多少出现在预测中
+      - 行命中率     (25%)：期望的每行（去除缩进后）有多少出现在预测中
 
     修复记录：
       [fix-1] 关键词过滤：排除 MATLAB 关键字 & 高频内置函数，避免虚高
       [fix-2] 行命中率：双边 strip 后用集合比较，消除缩进敏感问题
       [fix-3] 精确匹配：单独统计，不并入加权分（用于汇总展示）
-      [fix-4] 长度惩罚：对过度生成给予适度扣分
     """
     pred_norm = _normalize(pred)
     exp_norm  = _normalize(expected)
@@ -118,23 +116,12 @@ def score(pred: str, expected: str):
     else:
         line_score = char_sim
 
-    # ── 4. 长度惩罚 [fix-4] ───────────────────────────────────
-    # 预测与期望 token 数之比；超过 2 倍开始线性惩罚，最多扣满
-    exp_len  = max(len(exp_norm.split()), 1)
-    pred_len = len(pred_norm.split())
-    ratio    = pred_len / exp_len
-    if ratio <= 2.0:
-        length_score = 1.0
-    else:
-        # ratio=2 → 1.0；ratio=6 → 0.0（线性衰减）
-        length_score = max(0.0, 1.0 - (ratio - 2.0) / 4.0)
 
     # ── 综合加权 ──────────────────────────────────────────────
     total = (
-        char_sim      * 40 +
-        keyword_score * 30 +
-        line_score    * 20 +
-        length_score  * 10
+        char_sim      * 45 +
+        keyword_score * 35 +
+        line_score    * 20 
     )
 
     # ── 精确匹配 [fix-3] ──────────────────────────────────────
@@ -145,7 +132,6 @@ def score(pred: str, expected: str):
         round(char_sim     * 100, 1),
         round(keyword_score* 100, 1),
         round(line_score   * 100, 1),
-        round(length_score * 100, 1),
         exact,
     )
 
@@ -228,7 +214,7 @@ for i, item in enumerate(batch):
     assistant_part = clean_output(raw_output)
 
     # 评分逻辑保持
-    total, char_sim, kw_cov, line_hit, length_pen, exact = score(
+    total, char_sim, kw_cov, line_hit, exact = score(
         assistant_part, expected_output
     )
     scores.append(total)
@@ -241,10 +227,9 @@ for i, item in enumerate(batch):
     print(f"期望     : {expected_output[:80]}")
     print(f"预测     : {assistant_part[:80]}")
     print(f"综合评分 : {total}/100  {score_label(total)}{'  ✅ 精确匹配' if exact else ''}")
-    print(f"  ├─ 字符相似度 : {char_sim:>6}/100  (权重40%)")
-    print(f"  ├─ 关键词覆盖 : {kw_cov:>6}/100  (权重30%，已过滤通用词)")
-    print(f"  ├─ 行命中率   : {line_hit:>6}/100  (权重20%，缩进不敏感)")
-    print(f"  └─ 长度惩罚   : {length_pen:>6}/100  (权重10%，惩罚过度生成)")
+    print(f"  ├─ 字符相似度 : {char_sim:>6}/100  (权重45%)")
+    print(f"  ├─ 关键词覆盖 : {kw_cov:>6}/100  (权重35%，已过滤通用词)")
+    print(f"  └─ 行命中率   : {line_hit:>6}/100  (权重20%，缩进不敏感)")
 
 # ─────────────────────────────────────────────────────────────
 # 汇总统计
