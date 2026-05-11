@@ -5,7 +5,7 @@
 # export HF_DATASETS_OFFLINE=1
 # llamafactory-cli train /hy-tmp/my-project/my_qwen3_lora.yaml 启动命令
 ### model
-model_name_or_path: /hy-tmp/my-project/train_model/Qwen3.5-2B-base
+model_name_or_path: /hy-tmp/my-project/train_model/Qwen3.5-4B-Base
 trust_remote_code: true
 flash_attn: auto 
 use_unsloth: true
@@ -22,12 +22,12 @@ lora_target: all       # 覆盖所有线性层，不要只默认 q/v
 ### dataset
 dataset: code_train
 dataset_dir: /hy-tmp/my-project/train_data
-template: qwen3_nothink
-cutoff_len: 1024
+template: empty
+cutoff_len: 2048
 # max_samples: 1000
 
 ### output
-output_dir: /hy-tmp/my-project/saves_model/Qwen3.5-2B-base-test/lora/sft
+output_dir: /hy-tmp/my-project/saves_model/Qwen3.5-4B-base/lora/sft
 logging_steps: 50
 save_steps: 500
 plot_loss: true
@@ -39,7 +39,7 @@ report_to: none
 per_device_train_batch_size: 2  
 gradient_accumulation_steps: 16  
 learning_rate: 1.0e-4
-num_train_epochs: 5.0
+num_train_epochs: 3.0
 lr_scheduler_type: cosine
 warmup_ratio: 0.1
 bf16: true
