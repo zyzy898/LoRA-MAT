@@ -20,7 +20,7 @@ LoRA-MAT/
 ├── eval_results/            # 评估输出结果
 └── saves_model/             # 保存的 LoRA 权重
 ```
-<img width="640" height="480" alt="training_loss" src="https://github.com/user-attachments/assets/f6842546-7188-4187-b1bd-a0e09c86677d" />
+
 
 ## 🔧 数据清洗流程
 
@@ -86,6 +86,9 @@ gradient_accumulation_steps: 16
 learning_rate: 1.0e-4
 num_train_epochs: 3
 ```
+## 训练Loos曲线
+
+<img width="640" height="480" alt="training_loss" src="https://github.com/user-attachments/assets/f6842546-7188-4187-b1bd-a0e09c86677d" />
 
 ## 📝 许可证
 
