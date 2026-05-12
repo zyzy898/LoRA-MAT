@@ -38,21 +38,7 @@ def read_file_content(filename: str, data_dir: Path) -> str:
         return "[FILE NOT FOUND]"
 
     try:
-        content = file_path.read_text(encoding=FILE_ENCODING)
-
-        # ─────────────────────────────
-        # 删除以 % 开头的 MATLAB 注释行
-        # ─────────────────────────────
-        lines = content.splitlines()
-
-        cleaned_lines = [
-            line for line in lines
-            if not line.lstrip().startswith("%")
-        ]
-
-        content = "\n".join(cleaned_lines).strip()
-
-        return content
+        return file_path.read_text(encoding=FILE_ENCODING).strip()
 
     except OSError as e:
         logger.error("读取失败：%s → %s", file_path, e)
