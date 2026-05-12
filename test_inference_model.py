@@ -31,11 +31,11 @@ lora_path       = r"./saves_model/Qwen3.5-4B-base/lora/sft"
 test_data_path  = r"./train_data/code_test.json"
 
 # 每种 mode 最多抽取的样本数（总量 = mode数 × PER_MODE_LIMIT）
-PER_MODE_LIMIT = 40
+PER_MODE_LIMIT = 10
 
 # ─────────────────────────────────────────────────────────────
 # 输出目录
-# ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────   
 RUN_ID       = datetime.now().strftime("%Y%m%d_%H%M%S")
 OUTPUT_DIR   = f"./eval_results/{RUN_ID}"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
